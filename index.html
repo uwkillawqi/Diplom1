@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MealMaker - Планировщик питания</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Перейти к основному содержимому</a>
+  <header class="app-header">
+    <div class="app-header__inner">
+      <div class="header-top">
+        <div class="header-theme-tools">
+          <button type="button" class="btn-secondary" id="btn-theme-toggle" title="Светлая/тёмная тема" aria-pressed="false">
+            <span class="btn-icon" id="theme-icon" aria-hidden="true">🌙</span>
+            <span class="theme-label">Тема</span>
+          </button>
+          <select id="palette-select" class="palette-select" aria-label="Цветовая палитра">
+            <option value="lavender">Фиолетовый</option>
+            <option value="mint">Мятный</option>
+            <option value="rose">Розовый</option>
+            <option value="sky">Голубой</option>
+          </select>
+        </div>
+        <h1 class="app-title">
+          <span class="site-brand" aria-label="MealMaker">
+            <span class="site-logo" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="g" x1="3" y1="3" x2="25" y2="25" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="var(--accent)" />
+                    <stop offset="1" stop-color="#f472b6" />
+                  </linearGradient>
+                </defs>
+                <path d="M14 2.5C20.35 2.5 25.5 7.65 25.5 14C25.5 20.35 20.35 25.5 14 25.5C7.65 25.5 2.5 20.35 2.5 14C2.5 7.65 7.65 2.5 14 2.5Z" stroke="url(#g)" stroke-width="2"/>
+                <path d="M8.2 15.2C9.3 10.7 12.2 7.6 16.2 6.9" stroke="url(#g)" stroke-width="2" stroke-linecap="round"/>
+                <path d="M11.2 19.8C12.6 17.7 14.6 16.1 17 15.3" stroke="url(#g)" stroke-width="2" stroke-linecap="round"/>
+                <path d="M7.5 20.3L17.9 9.9" stroke="url(#g)" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <span class="site-brand__text">
+              <span class="site-name">MealMaker</span>
+              <span class="site-tagline">Планировщик питания на неделю</span>
+            </span>
+          </span>
+        </h1>
+        <div class="header-auth" id="header-auth">
+          <div class="header-auth__guest" id="header-auth-guest">
+            <button type="button" class="btn-secondary btn-auth-tight" id="btn-open-register">Регистрация</button>
+            <button type="button" class="btn-secondary btn-auth-tight" id="btn-open-login">Войти</button>
+          </div>
+          <div class="header-auth__user" id="header-auth-user" hidden>
+            <button type="button" class="btn-profile-icon" id="btn-profile" title="Профиль" aria-label="Открыть профиль">
+              <span class="btn-profile-icon__glyph" aria-hidden="true">👤</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="header-controls">
+        <div class="profile-row">
+          <label for="nutrition-profile">Профиль питания</label>
+          <select id="nutrition-profile" aria-describedby="profile-desc-text"></select>
+        </div>
+        <div class="user-metrics-grid" aria-label="Параметры пользователя">
+          <div class="gen-field">
+            <label for="user-gender">Пол</label>
+            <select id="user-gender">
+              <option value="male">Мужской</option>
+              <option value="female">Женский</option>
+            </select>
+          </div>
+          <div class="gen-field">
+            <label for="user-height">Рост, см</label>
+            <input type="number" id="user-height" min="120" max="230" value="175" />
+          </div>
+          <div class="gen-field">
+            <label for="user-weight">Вес, кг</label>
+            <input type="number" id="user-weight" min="35" max="250" step="0.1" value="75" />
+          </div>
+          <div class="gen-field">
+            <label for="user-age">Возраст</label>
+            <input type="number" id="user-age" min="14" max="100" value="30" />
+          </div>
+          <div class="gen-field">
+            <label for="user-activity">Активность</label>
+            <select id="user-activity">
+              <option value="1.2">Минимальная</option>
+              <option value="1.375">Низкая</option>
+              <option value="1.55" selected>Средняя</option>
+              <option value="1.725">Высокая</option>
+              <option value="1.9">Очень высокая</option>
+            </select>
+          </div>
+          <div class="gen-field">
+            <label for="user-goal">Задача</label>
+            <select id="user-goal">
+              <option value="maintain">Держать вес</option>
+              <option value="lose">Похудеть</option>
+              <option value="gain">Набрать</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="calorie-summary" id="calorie-summary" aria-live="polite"></div>
+      <p id="profile-desc-text" class="profile-desc"></p>
+    </div>
+  </header>
+
+  <main id="main-content" class="main-layout" tabindex="-1">
+    <section class="panel panel--dishes" aria-labelledby="dishes-heading">
+      <h2 id="dishes-heading" class="sr-only">База блюд и избранное</h2>
+      <div class="tabs" role="tablist" aria-label="Разделы блюд">
+        <button type="button" class="tab" role="tab" id="tab-all" aria-selected="true" aria-controls="panel-all">Все блюда</button>
+        <button type="button" class="tab" role="tab" id="tab-fav" aria-selected="false" aria-controls="panel-fav">Ваши любимые</button>
+        <button type="button" class="tab" role="tab" id="tab-my" aria-selected="false" aria-controls="panel-my">Мои блюда</button>
+        <button type="button" class="tab" role="tab" id="tab-deleted" aria-selected="false" aria-controls="panel-deleted">Удаленные блюда</button>
+      </div>
+      <div class="tab-panels">
+        <div class="tab-panel" role="tabpanel" id="panel-all" aria-labelledby="tab-all">
+          <div class="panel__body" id="dish-database"></div>
+        </div>
+        <div class="tab-panel" role="tabpanel" id="panel-fav" aria-labelledby="tab-fav" hidden>
+          <div class="panel__body" id="dish-favorites"></div>
+        </div>
+        <div class="tab-panel" role="tabpanel" id="panel-my" aria-labelledby="tab-my" hidden>
+          <div class="panel__body panel__body--my">
+            <button type="button" class="btn-primary" id="btn-add-dish" style="width: 100%; margin-bottom: 0.75rem;">+ Добавить своё блюдо</button>
+            <div id="dish-my-list"></div>
+          </div>
+        </div>
+        <div class="tab-panel" role="tabpanel" id="panel-deleted" aria-labelledby="tab-deleted" hidden>
+          <div class="panel__body" id="dish-deleted-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel panel--planner" aria-labelledby="planner-heading">
+      <div class="planner-toolbar">
+        <h2 id="planner-heading" style="margin: 0; font-size: 1rem;">Недельное меню</h2>
+        <div class="planner-toolbar__actions" style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
+          <div
+            class="drag-trash"
+            id="drag-trash"
+            hidden
+            role="button"
+            aria-label="Перетащите сюда блюдо для удаления из меню"
+          >
+            🗑️ Убрать
+          </div>
+          <button
+            type="button"
+            class="btn-secondary btn-danger-action"
+            id="btn-clear-menu"
+            aria-label="Очистить всё недельное меню"
+          >
+            🧹 Очистить всё
+          </button>
+          <button type="button" class="btn-secondary" id="btn-toggle-gen" aria-expanded="false" aria-controls="gen-panel">⚙️ Параметры генерации</button>
+          <button type="button" class="btn-secondary" id="btn-open-shopping-inline">🛒 Список покупок</button>
+          <button type="button" class="btn-secondary" id="btn-export-menu-pdf">⬇️ Скачать PDF</button>
+          <button type="button" class="btn-secondary" id="btn-export-shopping-pdf" hidden>⬇️ Скачать PDF</button>
+          <button type="button" class="btn-primary" id="btn-random-menu">🤖 Сгенерировать меню</button>
+        </div>
+      </div>
+      <div class="gen-panel" id="gen-panel" hidden>
+        <div class="gen-panel__grid">
+          <div class="gen-field">
+            <label for="gen-max-repeat">Макс. повторов одного блюда</label>
+            <input type="number" id="gen-max-repeat" min="1" max="28" value="2" />
+          </div>
+          <div class="gen-field">
+            <label for="gen-min-rating">Мин. рейтинг (звёзды)</label>
+            <input type="number" id="gen-min-rating" min="1" max="5" value="1" />
+          </div>
+          <div class="gen-field gen-field--check">
+            <input type="checkbox" id="gen-avoid-adjacent" checked />
+            <label for="gen-avoid-adjacent">Не повторять вчерашнее блюдо в том же приёме</label>
+          </div>
+          <div class="gen-field gen-field--check">
+            <input type="checkbox" id="gen-prefer-rating" checked />
+            <label for="gen-prefer-rating">Предпочитать более высокий рейтинг</label>
+          </div>
+        </div>
+        <div class="gen-panel__divider"></div>
+        <div class="gen-panel__allergy">
+          <p class="gen-panel__section-title">Исключить ингредиенты (аллергия / не нравится)</p>
+          <div class="gen-panel__allergy-tools">
+            <input type="text" id="gen-exclude-search" placeholder="Поиск: яйца, арахис, перец…" autocomplete="off" />
+            <button type="button" class="btn-secondary" id="btn-clear-exclusions" title="Снять все исключения">Очистить</button>
+          </div>
+          <div class="gen-exclude-list" id="gen-exclude-list" role="group" aria-label="Список ингредиентов для исключения"></div>
+          <p class="gen-panel__hint">Блюда, содержащие выбранные ингредиенты, не будут попадать в генерацию.</p>
+        </div>
+        <p style="margin: 0; font-size: 0.75rem; color: var(--text-muted);">Настройки сохраняются автоматически. Учитываются профиль питания и доступные блюда.</p>
+      </div>
+      <div class="planner-scroll" id="planner-view">
+        <div class="planner-grid" id="planner-grid" role="grid" aria-label="Сетка планировщика на 7 дней"></div>
+      </div>
+      <div class="planner-scroll" id="shopping-inline-view" hidden>
+        <div class="shopping-list-root shopping-inline-root" id="shopping-list-inline" aria-live="polite"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <div class="modal-overlay" id="auth-register-modal" hidden role="dialog" aria-modal="true" aria-labelledby="auth-register-title">
+    <div class="modal" id="auth-register-dialog">
+      <div class="modal__head">
+        <h2 id="auth-register-title">Регистрация</h2>
+        <button type="button" class="btn-secondary btn-close-round" id="auth-register-close" aria-label="Закрыть">✕</button>
+      </div>
+      <div class="modal__body">
+        <p id="auth-register-error" class="auth-form-error" hidden></p>
+        <form id="auth-register-form">
+          <div class="form-row">
+            <label for="auth-reg-login">Логин</label>
+            <input type="text" id="auth-reg-login" name="login" required autocomplete="username" maxlength="64" />
+          </div>
+          <div class="form-row">
+            <label for="auth-reg-email">Почта</label>
+            <input type="email" id="auth-reg-email" name="email" required autocomplete="email" maxlength="255" />
+          </div>
+          <div class="form-row">
+            <label for="auth-reg-password">Пароль</label>
+            <input type="password" id="auth-reg-password" name="password" required autocomplete="new-password" minlength="6" />
+          </div>
+          <button type="submit" class="btn-primary" style="width: 100%; margin-top: 0.35rem;">Зарегистрироваться</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="auth-login-modal" hidden role="dialog" aria-modal="true" aria-labelledby="auth-login-title">
+    <div class="modal" id="auth-login-dialog">
+      <div class="modal__head">
+        <h2 id="auth-login-title">Вход</h2>
+        <button type="button" class="btn-secondary btn-close-round" id="auth-login-close" aria-label="Закрыть">✕</button>
+      </div>
+      <div class="modal__body">
+        <p id="auth-login-error" class="auth-form-error" hidden></p>
+        <form id="auth-login-form">
+          <div class="form-row">
+            <label for="auth-in-login">Логин</label>
+            <input type="text" id="auth-in-login" name="login" required autocomplete="username" maxlength="64" />
+          </div>
+          <div class="form-row">
+            <label for="auth-in-password">Пароль</label>
+            <input type="password" id="auth-in-password" name="password" required autocomplete="current-password" />
+          </div>
+          <button type="submit" class="btn-primary" style="width: 100%; margin-top: 0.35rem;">Войти</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="profile-modal" hidden role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
+    <div class="modal modal--narrow">
+      <div class="modal__head">
+        <h2 id="profile-modal-title">Профиль</h2>
+        <button type="button" class="btn-secondary btn-close-round" id="profile-modal-close" aria-label="Закрыть">✕</button>
+      </div>
+      <div class="modal__body">
+        <div class="profile-summary">
+          <p class="profile-summary__label">Логин</p>
+          <p class="profile-summary__value" id="profile-display-login">—</p>
+          <p class="profile-summary__label">Почта</p>
+          <p class="profile-summary__value" id="profile-display-email">—</p>
+        </div>
+        <button type="button" class="btn-secondary profile-logout-btn" id="btn-logout" style="width: 100%; margin-top: 1rem;">Выйти</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="dish-detail-modal" hidden role="dialog" aria-modal="true" aria-labelledby="dish-detail-title">
+    <div class="modal modal--wide" id="dish-detail-dialog">
+      <div class="modal__head">
+        <h2 id="dish-detail-title">Блюдо</h2>
+      </div>
+      <div class="modal__body" id="dish-detail-body"></div>
+      <div class="modal__footer">
+        <button type="button" class="btn-secondary" id="dish-detail-close" aria-label="Закрыть">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="dish-modal" hidden role="dialog" aria-modal="true" aria-labelledby="dish-modal-title">
+    <div class="modal modal--dish-form" id="dish-modal-dialog">
+      <div class="modal__head modal__head--dish">
+        <div class="modal__head-text">
+          <p class="modal__eyebrow">Своё блюдо</p>
+          <h2 id="dish-modal-title">Новое блюдо</h2>
+        </div>
+        <button type="button" class="btn-close-round modal__close-top" id="dish-modal-close" aria-label="Закрыть">✕</button>
+      </div>
+      <div class="modal__body modal__body--dish">
+        <form id="dish-form" class="dish-form">
+          <input type="hidden" id="dish-edit-id" value="" />
+
+          <section class="dish-form__section">
+            <h3 class="dish-form__section-title">Основное</h3>
+            <div class="dish-form__grid dish-form__grid--2">
+              <div class="form-row">
+                <label for="dish-name">Название</label>
+                <input type="text" id="dish-name" required maxlength="120" autocomplete="off" placeholder="Например: каша с ягодами" />
+              </div>
+              <div class="form-row">
+                <label for="dish-emoji-select">Иконка</label>
+                <select id="dish-emoji-select" required aria-describedby="dish-emoji-hint"></select>
+              </div>
+            </div>
+            <p id="dish-emoji-hint" class="form-hint">Список иконок из базы блюд на сервере.</p>
+            <div class="form-row">
+              <label for="dish-category">Категория (слот меню)</label>
+              <select id="dish-category" required>
+                <option value="завтрак">Завтрак</option>
+                <option value="второй завтрак">Второй завтрак</option>
+                <option value="обед">Обед</option>
+                <option value="полдник">Полдник</option>
+                <option value="ужин">Ужин</option>
+              </select>
+            </div>
+          </section>
+
+          <section class="dish-form__section">
+            <h3 class="dish-form__section-title">Профили питания</h3>
+            <p class="form-hint">Отметьте хотя бы один профиль — для кого подходит блюдо.</p>
+            <div class="profile-checks profile-checks--grid" id="dish-profile-checks"></div>
+          </section>
+
+          <section class="dish-form__section">
+            <div class="dish-form__section-head">
+              <h3 class="dish-form__section-title">Ингредиенты</h3>
+              <button type="button" class="btn-secondary btn-secondary--compact" id="btn-add-ingredient">+ Добавить</button>
+            </div>
+            <p class="form-hint">Выберите продукт из списка или «Свой продукт…». Единицу и количество можно задать любые — например, авокадо в граммах, а не только в штуках.</p>
+            <div class="ingredient-table">
+              <div class="ingredient-table__head" aria-hidden="true">
+                <span>Название</span>
+                <span>Кол-во</span>
+                <span>Ед.</span>
+                <span>Группа</span>
+                <span></span>
+              </div>
+              <div class="ingredient-rows" id="ingredient-rows"></div>
+            </div>
+          </section>
+
+          <section class="dish-form__section dish-form__section--kbju">
+            <h3 class="dish-form__section-title">КБЖУ на порцию</h3>
+            <p class="form-hint">Укажите значения на одну порцию — они не считаются автоматически.</p>
+            <div class="dish-kbju-grid">
+              <div class="gen-field">
+                <label for="dish-kcal">Ккал</label>
+                <input type="number" id="dish-kcal" min="0" max="5000" step="1" placeholder="350" required />
+              </div>
+              <div class="gen-field">
+                <label for="dish-protein">Белки, г</label>
+                <input type="number" id="dish-protein" min="0" max="500" step="0.1" placeholder="20" required />
+              </div>
+              <div class="gen-field">
+                <label for="dish-fat">Жиры, г</label>
+                <input type="number" id="dish-fat" min="0" max="500" step="0.1" placeholder="12" required />
+              </div>
+              <div class="gen-field">
+                <label for="dish-carbs">Углеводы, г</label>
+                <input type="number" id="dish-carbs" min="0" max="500" step="0.1" placeholder="40" required />
+              </div>
+            </div>
+            <div class="form-row form-row--tight">
+              <label for="dish-portion-note">Пояснение к порции</label>
+              <input type="text" id="dish-portion-note" maxlength="120" placeholder="например: порция ~300 г" />
+            </div>
+          </section>
+
+          <section class="dish-form__section">
+            <h3 class="dish-form__section-title">Рецепт</h3>
+            <div class="form-row form-row--tight">
+              <label for="dish-recipe" class="visually-hidden">Рецепт приготовления</label>
+              <textarea id="dish-recipe" class="dish-recipe-textarea" maxlength="4000" placeholder="Пошагово опишите приготовление…" rows="5"></textarea>
+            </div>
+          </section>
+        </form>
+      </div>
+      <div class="modal__footer modal__footer--dish">
+        <button type="button" class="btn-secondary" id="dish-modal-cancel">Отмена</button>
+        <button type="submit" class="btn-primary" form="dish-form">Сохранить блюдо</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
