@@ -316,7 +316,7 @@ mockData.ingredients.forEach((ing) => {
   ing.group = INGREDIENT_GROUP_BY_ID[ing.id] || "other";
 });
 
-const API_BASE = "http://localhost:3001/api";
+const API_BASE = "/api";
 
 /** Эмодзи блюд с сервера (GET /api/bootstrap → dishEmojis), иначе — из mockData */
 let bootstrapDishEmojis = null;
