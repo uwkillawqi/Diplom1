@@ -563,10 +563,19 @@ app.put("/api/user/dish-prefs", authMiddleware, async (req, res) => {
   }
 });
 
+if (typeof PhusionPassenger !== "undefined") {
+  PhusionPassenger.configure({ autoInstall: false });
+}
+
 const PORT = Number(process.env.PORT || 3001);
-app.listen(PORT, () => {
-  console.log(`API started: http://localhost:${PORT}`);
-});
+
+if (typeof PhusionPassenger !== "undefined") {
+  app.listen("passenger");
+} else {
+  app.listen(PORT, () => {
+    console.log(`API started: http://localhost:${PORT}`);
+  });
+}
 
 function safeJsonParse(value, fallback) {
   try {
